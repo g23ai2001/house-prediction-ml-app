@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Price Prediction</title>
+    <!-- External Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Home Price Prediction</h2>
+        <form id="predictionForm">
+            <label for="square_footage">Square Footage</label>
+            <input type="number" id="square_footage" placeholder="Enter square footage" required>
+
+            <label for="bedrooms">Bedrooms</label>
+            <input type="number" id="bedrooms" placeholder="Enter number of bedrooms" required>
+
+            <label for="bathrooms">Bathrooms</label>
+            <input type="number" id="bathrooms" placeholder="Enter number of bathrooms" required>
+
+            <button type="submit">Predict</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- jQuery for handling the form submission and AJAX request -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#predictionForm').on('submit', function(event) {
+                event.preventDefault();
+                
+                // Get input values
+                const squareFootage = $('#square_footage').val();
+                const bedrooms = $('#bedrooms').val();
+                const bathrooms = $('#bathrooms').val();
+
+                // Clear previous result
+                $('#result').text('');
+
+                // Make AJAX POST request to Flask backend
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        square_footage: parseInt(squareFootage),
+                        bedrooms: parseInt(bedrooms),
+                        bathrooms: parseInt(bathrooms)
+                    }),
+                    success: function(response) {
+                        // Display the predicted price
+                        $('#result').text('Predicted Price: ₹' + response.predicted_price);
+                    },
+                    error: function(error) {
+                        $('#result').text('Error: ' + error.responseJSON.error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
